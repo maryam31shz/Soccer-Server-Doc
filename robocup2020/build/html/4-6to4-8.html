@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>1. Heterogeneous Players &#8212; Razi Server Doc  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Razi Server Doc’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="heterogeneous-players">
+<h1><span class="section-number">1. </span>Heterogeneous Players<a class="headerlink" href="#heterogeneous-players" title="Permalink to this headline">¶</a></h1>
+<p>With Soccer Server 7, heterogeneous players were introduced. For heterogeneous players, Soccer Server generates <strong>player_types</strong> random player types at startup. The player types have different abilities based on the tradeoffs defined in the <code class="docutils literal notranslate"><span class="pre">player.conf</span></code> file. Both teams of a match use the same player types. Type 0 is the default type and always the same.</p>
+<p>When the players connect to the server, the receive information on the available player types (see Sec. 4.2.1). The online coach can change player types unlimited times in <code class="docutils literal notranslate"><span class="pre">before_kick_off</span></code> mode and change player types <strong>subs_max</strong> times during other <code class="docutils literal notranslate"><span class="pre">non-play_on</span></code> play modes using the <strong>change_player_type</strong> … command (see Sec. 7.4).</p>
+<p>Each time a player is substituted by some other player type, its stamina, recovery and effort is reset to the initial (maximum) value of the respective player type.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 74%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter in <code class="docutils literal notranslate"><span class="pre">player.conf</span></code></p></th>
+<th class="head"><p><strong>Value</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>player_types</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-odd"><td><p>subs_max</p></td>
+<td><p>3</p></td>
+</tr>
+</tbody>
+</table>
+<p class="centered">
+<strong>Table 4.11: Parameter for substitutions and heterogeneous player types</strong></p></div>
+<div class="section" id="referee-model">
+<h1><span class="section-number">2. </span>Referee Model<a class="headerlink" href="#referee-model" title="Permalink to this headline">¶</a></h1>
+<p>The Automated Referee sends messages to the players, so that players know the actual
+play mode of the game. The rules and the behavior for the automated referee are
+described in Sec. 2.2.1. Players receive the referee messages as hear messages. A player
+can hear referee messages in every situation independent of the number of messages the
+player heard from other players.</p>
+<div class="section" id="play-modes-and-referee-messages">
+<h2><span class="section-number">2.1. </span>Play Modes and referee messages<a class="headerlink" href="#play-modes-and-referee-messages" title="Permalink to this headline">¶</a></h2>
+<p>The change of the play mode is announced by the referee. Additionally, there are some
+referee messages announcing events like a goal or a foul. If you have a look into the
+server source code, you will notice some additional play modes that are currently not
+used. Both play modes and referee messages are announced using <strong>(referee String )</strong>,
+where String is the respective play mode or message string. The play modes are listed
+in Tab. 4.12, for the messages see Tab. 4.13.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 14%" />
+<col style="width: 24%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Play Mode</strong></p></th>
+<th class="head"><p><strong>tc</strong></p></th>
+<th class="head"><p><strong>Subsequent Play Mode</strong></p></th>
+<th class="head"><p><strong>Comment</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>‘before kick off’</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘kick_off_Side’</em></p></td>
+<td><p>at the beginning of a half</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>‘play_on’</strong></p></td>
+<td colspan="2"></td>
+<td><p>during normal play</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>‘time_over’</strong></p></td>
+<td colspan="3"></td>
+</tr>
+<tr class="row-odd"><td><p><strong>‘kick_off_Side’</strong></p></td>
+<td colspan="2"></td>
+<td><p>announce start of play
+(after pressing the Kick Off button)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>‘kick_in_Side’</strong></p></td>
+<td colspan="3"></td>
+</tr>
+<tr class="row-odd"><td><p><strong>‘free_kick_Side’</strong></p></td>
+<td colspan="3"></td>
+</tr>
+<tr class="row-even"><td><p><strong>‘corner_kick_Side’</strong></p></td>
+<td colspan="3"></td>
+</tr>
+<tr class="row-odd"><td><p><strong>‘goal_kick_Side’</strong></p></td>
+<td></td>
+<td><p><em>‘play_on’</em></p></td>
+<td><p>play mode changes once
+the ball leaves the penalty area</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>‘goal_Side’</strong></p></td>
+<td colspan="2"></td>
+<td><p>currently unused
+(but see Tab. 4.13)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>‘drop_ball’</strong></p></td>
+<td><p>0</p></td>
+<td colspan="2"><p><em>‘play_on’</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>‘offside_Side’</strong></p></td>
+<td><p>30</p></td>
+<td><p><em>‘free_kick_Side’</em></p></td>
+<td><p>for the opposite side</p></td>
+</tr>
+</tbody>
+</table>
+<p>Where Side is either the character ‘l’ or ‘r’, OSide means opponent’s side.
+tc is the time (in number of cycles) until the subsequent play mode will be announced</p>
+<p class="centered">
+<strong>Table 4.12: Play Modes</strong></p><table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 14%" />
+<col style="width: 22%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Message</strong></p></th>
+<th class="head"><p><strong>tc</strong></p></th>
+<th class="head"><p><strong>subsequent play mode</strong></p></th>
+<th class="head"><p><strong>comment</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>goal_Side_n</strong></p></td>
+<td><p>50</p></td>
+<td><p><em>‘kick_off_OSide’</em></p></td>
+<td><p>announce the nth goal for a team</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>foul_Side</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘free_kick_OSide’</em></p></td>
+<td><p>announce a foul</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>goalie_catch_ball_Side</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘free_kick_OSide’</em></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>time_up_without_a_team</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘time_over’</em></p></td>
+<td><p>sent if there was no opponent until
+the end of the second half</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>time_up</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘time_over’</em></p></td>
+<td><p>sent once the game is over
+(if the time is ? second half and
+the scores for each team are different)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>half_time</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘before_kick_off’</em></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>time_extended</strong></p></td>
+<td><p>0</p></td>
+<td><p><em>‘before_kick_off’</em></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Where Side is either the character ‘l’ or ‘r’, OSide means opponent’s side.
+tc is the time (in number of cycles) until the subsequent play mode will be announced</p>
+<p class="centered">
+<strong>Table 4.13: Referee Messages</strong></p></div>
+</div>
+<div class="section" id="the-soccer-simulation">
+<h1><span class="section-number">3. </span>The Soccer Simulation<a class="headerlink" href="#the-soccer-simulation" title="Permalink to this headline">¶</a></h1>
+<p>In Sec. 4.4, we gave a description on how the objects are moved with respect to their accelerations and velocities. In this section, we describe at what point in time acceleration
+and velocities are applied to the objects during the simulation.</p>
+<div class="section" id="description-of-the-simulation-algorithm">
+<h2><span class="section-number">3.1. </span>Description of the simulation algorithm<a class="headerlink" href="#description-of-the-simulation-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>In Soccer Server, time is updated in discrete steps. A simulation step is 100ms. During each simulation step, objects (i.e. players and the ball) stay on their positions. If players decide to act within a step, actions are applied to the players and the ball at the transition from one simulation cycle to the next. Depending on the play mode, not all actions are allowed for the players (for instance in <code class="docutils literal notranslate"><span class="pre">before_kick_off</span></code> mode, players can <strong>turn</strong> and <strong>move</strong>, but they cannot <strong>dash</strong>), so only allowed actions will be applied and take effect.</p>
+<p>If during a step, several players kick the ball, all the kicks are applied to the ball and a resulting acceleration is calculated. If the resulting acceleration is larger than the maximum acceleration for the ball, acceleration is normalized to its maximum value. After moving the objects, the server checks for collisions and updates velocities if a collision occurred (see also Sec. 4.4.2).</p>
+<p>When applying accelerations and velocities to the objects, the order of application is randomized. After changing objects positions, and updating velocities and accelerations, the automated referee checks the situation and changes the play mode or the object positions, if necessary. Changes to the play mode are announced immediately. Finally, stamina for each player is updated.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Razi Server Doc</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Heterogeneous Players</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#referee-model">2. Referee Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#play-modes-and-referee-messages">2.1. Play Modes and referee messages</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#the-soccer-simulation">3. The Soccer Simulation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#description-of-the-simulation-algorithm">3.1. Description of the simulation algorithm</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Razi Server Doc’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Razi Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/4-6to4-8.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
